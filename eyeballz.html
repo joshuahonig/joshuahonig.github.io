@@ -1,0 +1,156 @@
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.min.js"
+        integrity="sha512-vPeZ7JCboHcfpqSx5ZD+/jpEhS4JpXxfz9orSvAPPj0EKUVShU2tgy7XkU+oujBJKnWmu4hU7r9MMQNWPfXsYw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body style="margin:0px;">
+    <script>
+        var eyeballs = new Array(10);
+        var topColor = randomColor();
+        var botColor = randomColor();
+
+        function setGradient(x, y, w, h, c1, c2, axis) {
+            noFill();
+            for (let i = y; i <= y + h; i++) {
+                let inter = map(i, y, y + h, 0, 1);
+                let c = lerpColor(c1, c2, inter);
+                stroke(c);
+                line(x, i, x + w, i);
+            }
+
+        }
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            for (var i = 0; i < eyeballs.length; i++) {
+                eyeballs[i] = new Eyeball(random(width), random(height));
+            }
+            console.log("P5");
+        }
+
+        function draw() {
+            b1 = color(topColor);
+            b2 = color(botColor);
+            c1 = color(204, 102, 0);
+            c2 = color(0, 102, 153);
+            setGradient(0, 0, width, height, b1, b2, 2);
+            for (let i = 0; i < eyeballs.length; i++) {
+                eyeballs[i].move(); // each time through the loop, move the next object in the array
+                eyeballs[i].display(); // call the display method for each object (0 - 9)
+            }
+
+        }
+
+        //class constructor 
+        function Eyeball(xLoc, yLoc) { // the UFO constructor expects two arguments
+            this.x = xLoc; // all object properties and methods begin with "this."
+            this.y = yLoc;
+            this.d = random(100, 50); /* Iris diameter */
+            this.speed = random(2) + 0.5;
+            this.scaleFactor = random(.2, 1.2);
+            this.colorHex = randomColor({ luminosity: 'dark' });
+            this.totalDiameter = (
+                (this.d * this.scaleFactor) + /* inner eye circle */
+                (250 * this.scaleFactor)
+
+            );
+
+
+
+            this.display = function () { // define how the object will look
+                push();
+                stroke("#000000");
+                translate(this.x, this.y);
+                scale(this.scaleFactor);
+                fill(222);
+                strokeWeight(6); /* outer eye black line */
+                ellipse(0, 0, 300, 300); /* whites of eyes */
+
+                /* Inner eye color */
+                strokeWeight(9);
+                fill(this.colorHex);
+                ellipse(0, 0, 150, 150); //colored eye
+                fill(0);
+                ellipse(0, 0, 50, 50); //pupil
+
+                /* Highlights */
+                fill(215);
+                strokeWeight(0);
+                ellipse(35, 0, 30, 30); //right center highlight
+                ellipse(0, 260 - 300, 40, 40); //top highlight
+                ellipse(40, 260 - 300, 20, 20); //lil highlight
+
+                /* Eyelashes */
+                strokeWeight(5);
+                //line(0, -150, 400 - 400, 50 - 300); //middle top eyelash
+                line(0, -150, 0, -250);
+
+                //line(0, 150, 400 - 400, 550 - 300); //middle bottom lash
+                line(0, 150, 0, 250);
+
+                //line(250 - 400, 0, 100 - 400, 300 - 300); //left lash
+                line(-150, 0, -300, 0);
+
+                //line(550 - 400, 0, 700 - 400, 300 - 300); //right lash
+                line(150, 0, 300, 0);
+
+                line(185 - 400, 480 - 300, 283 - 400, 400 - 300); //southwest lash
+                line(185 - 400, 100 - 300, 287 - 400, 200 - 300); // northwest
+                line(512 - 400, 200 - 300, 611 - 400, 100 - 300); //northeast
+                line(512 - 400, 400 - 300, 611 - 400, 500 - 300);//southeast
+                // draw a circle based on this object's properties
+                pop();
+            }
+
+            this.move = function () {
+                // define how the object will change location on screen each frame
+                this.x += this.speed; // initially, move to the right by 1 pixel
+
+                /* Lashes are 150px * this.scaleFactor. Detect if the eyeball 
+                   (including lashes) is fully off the screen, so we can change it. */
+
+                if (
+                    (this.x - this.totalDiameter) > width ||
+                    (this.x + this.totalDiameter) < 0
+                ) {
+                    /* Move the eyeball very far off the page while we change it */
+                    this.x = width + 1000;
+                    this.d = random(100, 50); /* Iris diameter */
+                    this.speed = random(2) + 0.5;
+                    this.scaleFactor = random(.2, 1.2);
+                    this.colorHex = randomColor({ hue: 'dark' });
+                    this.colorRed = parseInt(this.colorHex[1] + this.colorHex[2], 16);
+                    this.colorBlue = parseInt(this.colorHex[3] + this.colorHex[4], 16);
+                    this.colorGreen = parseInt(this.colorHex[5] + this.colorHex[6], 16);
+                    this.totalDiameter = (
+                        (this.d * this.scaleFactor) + /* inner eye circle */
+                        (250 * this.scaleFactor)
+                    );
+                    this.x = random(width);
+                    if (random(1) > 0.5) {
+                        /* Originate from left side of screen */
+                        this.x = this.totalDiameter * -1;
+                        this.speed = random(2);
+                        //if (this.speed < 0) this.speed *= -1; /* if going left, go right */
+                    } else {
+                        /* Originate from right side of screen */
+                        this.x = this.totalDiameter + width;
+                        this.speed = random(2) * -1;
+                        //if (this.speed > 0) this.speed *= -1; /* if going right, go left */
+                    }
+                    this.y = random(height);
+                }
+                //TODO: pull all the way off screen, change color, randomize X & direction of travel
+                //  to make it appear as though the old one has left and a new one has appeared 
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
