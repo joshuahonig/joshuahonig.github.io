@@ -50,7 +50,7 @@
             this.x = xLoc; // all object properties and methods begin with "this."
             this.y = yLoc;
             this.d = random(100, 50); /* Iris diameter */
-            this.speed = random(2) + 0.5;
+            this.speed = random(2) + 1;
             this.scaleFactor = random(.2, 1.2);
             this.colorHex = randomColor({ luminosity: 'dark' });
             this.totalDiameter = (
@@ -120,7 +120,7 @@
                     /* Move the eyeball very far off the page while we change it */
                     this.x = width + 1000;
                     this.d = random(100, 50); /* Iris diameter */
-                    this.speed = random(2) + 0.5;
+                    this.speed = random(2) + 1;
                     this.scaleFactor = random(.2, 1.2);
                     this.colorHex = randomColor({ hue: 'dark' });
                     this.colorRed = parseInt(this.colorHex[1] + this.colorHex[2], 16);
